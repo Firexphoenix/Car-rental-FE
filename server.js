@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const { engine } = require("express-handlebars");
 const path = require("path");
@@ -5,7 +7,7 @@ const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-const API_URL = process.env.API_URL;
+const API_URL = process.env.API_URL || 'http://localhost:3000/api';
 const DEFAULT_IMAGE = "/image/car.jpg";
 // Cấu hình Handlebars
 app.engine(
