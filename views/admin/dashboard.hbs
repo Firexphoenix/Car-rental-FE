@@ -1,0 +1,230 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-chart-line"></i> Dashboard Quản Trị</h2>
+    </div>
+</div>
+
+{{#if overview}}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white-50">Tổng Đặt Xe</h6>
+                        <h2 class="mb-0">{{overview.totalBookings}}</h2>
+                    </div>
+                    <i class="fas fa-calendar-check fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white-50">Đã Xác Nhận</h6>
+                        <h2 class="mb-0">{{overview.confirmedBookings}}</h2>
+                    </div>
+                    <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white-50">Chờ Xác Nhận</h6>
+                        <h2 class="mb-0">{{overview.pendingBookings}}</h2>
+                    </div>
+                    <i class="fas fa-clock fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-white-50">Hoàn Thành</h6>
+                        <h2 class="mb-0">{{overview.completedBookings}}</h2>
+                    </div>
+                    <i class="fas fa-flag-checkered fa-3x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Card -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-money-bill-wave"></i> Tổng Doanh Thu
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <h1 class="display-4 text-primary mb-0">
+                    {{formatCurrency overview.totalRevenue}}
+                </h1>
+                <p class="text-muted">Từ tất cả các đặt xe</p>
+            </div>
+        </div>
+    </div>
+</div>
+{{/if}}
+
+{{#if stats}}
+<!-- Booking Statistics by Status -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie"></i> Thống Kê Theo Trạng Thái
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Trạng Thái</th>
+                                <th class="text-center">Số Lượng</th>
+                                <th class="text-end">Doanh Thu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each stats}}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-{{statusBadge this._id}}">
+                                        {{this._id}}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <strong>{{this.count}}</strong>
+                                </td>
+                                <td class="text-end">
+                                    <strong>{{formatCurrency this.totalRevenue}}</strong>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Average Values -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator"></i> Giá Trị Trung Bình
+                </h5>
+            </div>
+            <div class="card-body">
+                {{#if stats.[0]}}
+                <div class="row text-center">
+                    <div class="col-12 mb-4">
+                        <h6 class="text-muted">Doanh Thu Trung Bình/Đặt Xe</h6>
+                        <h3 class="text-primary">
+                            {{formatCurrency stats.[0].avgRevenue}}
+                        </h3>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted">Giá Thấp Nhất</h6>
+                        <h4 class="text-success">
+                            {{formatCurrency stats.[0].minRevenue}}
+                        </h4>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted">Giá Cao Nhất</h6>
+                        <h4 class="text-danger">
+                            {{formatCurrency stats.[0].maxRevenue}}
+                        </h4>
+                    </div>
+                </div>
+                {{else}}
+                <p class="text-center text-muted">Chưa có dữ liệu</p>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>
+{{/if}}
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt"></i> Thao Tác Nhanh
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="/bookings" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-list"></i> Xem Tất Cả Đặt Xe
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/cars" class="btn btn-outline-success w-100">
+                            <i class="fas fa-car"></i> Quản Lý Xe
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/users" class="btn btn-outline-info w-100">
+                            <i class="fas fa-users"></i> Quản Lý Người Dùng
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/contracts" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-file-contract"></i> Xem Hợp Đồng
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Info -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle"></i> Thông Tin Hệ Thống
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><strong>Phiên bản:</strong> 2.0.0</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Database:</strong> MongoDB with Mongoose</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Cập nhật lần cuối:</strong> {{formatDateTime}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

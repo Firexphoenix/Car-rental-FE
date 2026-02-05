@@ -1,0 +1,190 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-car"></i> Chi Tiết Xe</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/cars">Xe</a></li>
+                <li class="breadcrumb-item active">Chi tiết</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+{{#if car}}
+<div class="row">
+    <!-- Images Gallery -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                {{#if car.images}}
+                <div id="carouselImages" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {{#each car.images}}
+                        <div class="carousel-item {{#if @first}}active{{/if}}">
+                            <img src="{{firstImage this.images}}" class="d-block w-100" alt="Car image" style="height: 400px; object-fit: cover;">
+                        </div>
+                        {{/each}}
+                    </div>
+                    {{#if (gt car.images.length 1)}}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselImages" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
+                    {{/if}}
+                </div>
+                {{else}}
+                <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <i class="fas fa-car fa-5x text-white opacity-50"></i>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+
+    <!-- Car Details -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    {{car.brand}} {{car.model}}
+                    <span class="badge bg-{{statusBadge car.status}} float-end">{{car.status}}</span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h3 class="text-primary">
+                        {{formatCurrency car.pricePerDay}}
+                        <small class="text-muted fs-6">/ngày</small>
+                    </h3>
+                </div>
+
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-id-card text-primary"></i> Biển số:</td>
+                            <td><strong>{{car.licensePlate}}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-calendar text-primary"></i> Năm sản xuất:</td>
+                            <td><strong>{{car.year}}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-paint-brush text-primary"></i> Màu sắc:</td>
+                            <td><strong>{{car.color}}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-users text-primary"></i> Số chỗ ngồi:</td>
+                            <td><strong>{{car.seats}} chỗ</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-cog text-primary"></i> Hộp số:</td>
+                            <td><strong>{{car.transmission}}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-gas-pump text-primary"></i> Nhiên liệu:</td>
+                            <td><strong>{{car.fuelType}}</strong></td>
+                        </tr>
+                        {{#if car.owner}}
+                        <tr>
+                            <td><i class="fas fa-user text-primary"></i> Chủ xe:</td>
+                            <td>
+                                <a href="/users/{{car.owner._id}}">
+                                    {{#if car.owner.fullName}}
+                                        {{car.owner.fullName}}
+                                    {{else}}
+                                        {{car.owner}}
+                                    {{/if}}
+                                </a>
+                            </td>
+                        </tr>
+                        {{/if}}
+                    </tbody>
+                </table>
+
+                {{#if car.description}}
+                <div class="mt-3">
+                    <h6><i class="fas fa-info-circle"></i> Mô tả:</h6>
+                    <p class="text-muted">{{car.description}}</p>
+                </div>
+                {{/if}}
+
+                {{#if car.features}}
+                <div class="mt-3">
+                    <h6><i class="fas fa-check-circle"></i> Tính năng:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {{#each car.features}}
+                        <span class="badge bg-info">
+                            <i class="fas fa-check"></i> {{this}}
+                        </span>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/if}}
+
+                <div class="d-flex gap-2 mt-4">
+                    <a href="/bookings/create?carId={{car._id}}" class="btn btn-success flex-fill">
+                        <i class="fas fa-calendar-check"></i> Đặt Xe Ngay
+                    </a>
+                    <button class="btn btn-warning" onclick="editCar()">
+                        <i class="fas fa-edit"></i> Sửa
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteCar()">
+                        <i class="fas fa-trash"></i> Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Info -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-clock"></i> Thông Tin Thời Gian</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Ngày tạo:</strong> {{formatDateTime car.createdAt}}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Cập nhật lần cuối:</strong> {{formatDateTime car.updatedAt}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editCar() {
+    window.location.href = '/cars/{{car._id}}/edit';
+}
+
+function deleteCar() {
+    if (confirm('Bạn có chắc chắn muốn xóa xe này?')) {
+        fetch('http://localhost:3000/api/cars/{{car._id}}', {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Đã xóa xe thành công!');
+            window.location.href = '/cars';
+        })
+        .catch(error => {
+            alert('Lỗi khi xóa xe: ' + error.message);
+        });
+    }
+}
+</script>
+
+{{else}}
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i> Không tìm thấy thông tin xe
+</div>
+{{/if}}

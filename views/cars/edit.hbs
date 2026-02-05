@@ -1,0 +1,170 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-edit"></i> Cập Nhật Thông Tin Xe</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/cars">Xe</a></li>
+                <li class="breadcrumb-item active">Sửa: {{car.licensePlate}}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form id="editCarForm" data-id="{{car._id}}">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Chủ xe <span class="text-danger">*</span></label>
+                    <select class="form-select" name="owner" id="ownerSelect" required>
+                        <option value="">-- Chọn chủ xe --</option>
+                        {{#each users}}
+                        <option value="{{this._id}}">{{this.fullName}} ({{this.email}})</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Biển số xe <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="licensePlate" value="{{car.licensePlate}}" required />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Hãng xe</label>
+                    <input type="text" class="form-control" name="brand" value="{{car.brand}}" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Model</label>
+                    <input type="text" class="form-control" name="model" value="{{car.model}}" required />
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Năm SX</label>
+                    <input type="number" class="form-control" name="year" value="{{car.year}}" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Màu sắc</label>
+                    <input type="text" class="form-control" name="color" value="{{car.color}}" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Số chỗ</label>
+                    <input type="number" class="form-control" name="seats" value="{{car.seats}}" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Giá thuê/ngày</label>
+                    <input type="number" class="form-control" name="pricePerDay" value="{{car.pricePerDay}}" required />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Hộp số</label>
+                    <select class="form-select" name="transmission" id="transSelect">
+                        <option value="AUTOMATIC">Tự động</option>
+                        <option value="MANUAL">Số sàn</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Nhiên liệu</label>
+                    <select class="form-select" name="fuelType" id="fuelSelect">
+                        <option value="PETROL">Xăng</option>
+                        <option value="DIESEL">Dầu</option>
+                        <option value="ELECTRIC">Điện</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-select" name="status" id="statusSelect">
+                        <option value="AVAILABLE">Sẵn sàng</option>
+                        <option value="RENTED">Đang thuê</option>
+                        <option value="MAINTENANCE">Bảo trì</option>
+                        <option value="UNAVAILABLE">Ngưng hoạt động</option>
+                    </select>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label">Mô tả</label>
+                    <textarea class="form-control" name="description" rows="2">{{car.description}}</textarea>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label">Tính năng (Mỗi dòng 1 tính năng)</label>
+                    <textarea class="form-control" id="featuresInput" rows="3">{{#each car.features}}{{this}}&#10;{{/each}}</textarea>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label">Link Hình ảnh (Mỗi dòng 1 link)</label>
+                    <textarea class="form-control" id="imagesInput" rows="3">{{#each car.images}}{{this}}&#10;{{/each}}</textarea>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <a href="/cars" class="btn btn-secondary me-2">Hủy</a>
+                <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Lưu Thay Đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. Tự động chọn đúng giá trị cũ cho các ô Select ---
+        // Lấy giá trị từ server đổ vào biến JS (đặt trong dấu nháy)
+        const currentOwner = "{{#if car.owner._id}}{{car.owner._id}}{{else}}{{car.owner}}{{/if}}";
+        const currentTrans = "{{car.transmission}}";
+        const currentFuel = "{{car.fuelType}}";
+        const currentStatus = "{{car.status}}";
+
+        // Tìm thẻ select và gán value
+        const ownerSelect = document.getElementById('ownerSelect');
+        if(ownerSelect && currentOwner) ownerSelect.value = currentOwner;
+
+        const transSelect = document.getElementById('transSelect');
+        if(transSelect && currentTrans) transSelect.value = currentTrans;
+
+        const fuelSelect = document.getElementById('fuelSelect');
+        if(fuelSelect && currentFuel) fuelSelect.value = currentFuel;
+        
+        const statusSelect = document.getElementById('statusSelect');
+        if(statusSelect && currentStatus) statusSelect.value = currentStatus;
+
+
+        // --- 2. Xử lý nút LƯU (Gửi API PUT) ---
+        const form = document.getElementById('editCarForm');
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Chặn reload trang
+            
+            const carId = this.getAttribute('data-id');
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            // Xử lý mảng (cắt dòng)
+            const featuresRaw = document.getElementById('featuresInput').value;
+            data.features = featuresRaw.split('\n').map(x => x.trim()).filter(x => x);
+
+            const imagesRaw = document.getElementById('imagesInput').value;
+            data.images = imagesRaw.split('\n').map(x => x.trim()).filter(x => x);
+
+            try {
+                // Gửi request PUT tới Backend (Port 3000)
+                const response = await fetch(`http://localhost:3000/api/cars/${carId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('✅ Cập nhật thành công!');
+                    window.location.href = '/cars/' + carId; // Về trang chi tiết
+                } else {
+                    const result = await response.json();
+                    alert('❌ Lỗi: ' + (result.message || 'Không thể cập nhật'));
+                }
+            } catch (error) {
+                console.error(error);
+                alert('❌ Lỗi kết nối đến Server API');
+            }
+        });
+    });
+</script>

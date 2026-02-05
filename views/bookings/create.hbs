@@ -1,0 +1,208 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-calendar-plus"></i> Tạo Đặt Xe Mới</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/bookings">Đặt xe</a></li>
+                <li class="breadcrumb-item active">Tạo mới</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Thông Tin Đặt Xe</h5>
+            </div>
+            <div class="card-body">
+                <form id="createBookingForm">
+                    <!-- User Selection -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i> Khách hàng <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" name="user" id="userSelect" required>
+                            <option value="">-- Chọn khách hàng --</option>
+                            {{#each users}}
+                            <option value="{{this._id}}">
+                                {{this.fullName}} - {{this.email}} - {{this.phone}}
+                            </option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                    <!-- Car Selection -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-car"></i> Xe thuê <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select" name="car" id="carSelect" required>
+                            <option value="">-- Chọn xe --</option>
+                            {{#each cars}}
+                            {{#if (eq this.status 'AVAILABLE')}}
+                            <option value="{{this._id}}" data-price="{{this.pricePerDay}}">
+                                {{this.brand}} {{this.model}} ({{this.licensePlate}}) - {{formatCurrency this.pricePerDay}}/ngày
+                            </option>
+                            {{/if}}
+                            {{/each}}
+                        </select>
+                        <small class="text-muted">Chỉ hiển thị xe đang sẵn sàng</small>
+                    </div>
+
+                    <div class="row">
+                        <!-- Start Date -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i> Ngày bắt đầu <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control" name="startDate" id="startDate" required>
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt"></i> Ngày kết thúc <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control" name="endDate" id="endDate" required>
+                        </div>
+                    </div>
+
+                    <!-- Price Calculation -->
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Số ngày thuê:</strong> <span id="daysCount">0</span> ngày</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Giá/ngày:</strong> <span id="pricePerDay">0 ₫</span></p>
+                            </div>
+                            <div class="col-12">
+                                <hr class="my-2">
+                                <h5 class="text-primary mb-0">
+                                    <strong>Tổng tiền dự kiến:</strong> 
+                                    <span id="totalPrice">0 ₫</span>
+                                </h5>
+                                <small class="text-muted">Giá chính xác sẽ được tính bởi hệ thống</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-sticky-note"></i> Ghi chú
+                        </label>
+                        <textarea class="form-control" name="notes" rows="3" placeholder="Ghi chú thêm về đặt xe..."></textarea>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-info-circle"></i> Trạng thái
+                        </label>
+                        <select class="form-select" name="status">
+                            <option value="PENDING" selected>Chờ xác nhận</option>
+                            <option value="CONFIRMED">Đã xác nhận</option>
+                        </select>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="/bookings" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Tạo Đặt Xe
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const carSelect = document.getElementById('carSelect');
+const startDate = document.getElementById('startDate');
+const endDate = document.getElementById('endDate');
+
+// Set min date to today
+const today = new Date().toISOString().split('T')[0];
+startDate.min = today;
+endDate.min = today;
+
+function calculatePrice() {
+    const selectedCar = carSelect.options[carSelect.selectedIndex];
+    const pricePerDay = parseFloat(selectedCar.dataset.price) || 0;
+    
+    const start = new Date(startDate.value);
+    const end = new Date(endDate.value);
+    
+    if (start && end && end >= start) {
+        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        const total = days * pricePerDay;
+        
+        // ✅ CHECK NULL trước khi set textContent
+        const daysCountEl = document.getElementById('daysCount');
+        const pricePerDayEl = document.getElementById('pricePerDay');
+        const totalPriceEl = document.getElementById('totalPrice');
+        
+        if (daysCountEl) daysCountEl.textContent = days;
+        if (pricePerDayEl) pricePerDayEl.textContent = new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(pricePerDay);
+        if (totalPriceEl) totalPriceEl.textContent = new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(total);
+    }
+}
+
+carSelect.addEventListener('change', calculatePrice);
+startDate.addEventListener('change', () => {
+    endDate.min = startDate.value;
+    calculatePrice();
+});
+endDate.addEventListener('change', calculatePrice);
+
+document.getElementById('createBookingForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    console.log("📤 [FE] Gửi data:", data);
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        console.log("📥 [FE] Response:", result);
+        
+        if (response.ok) {
+            alert('Đã tạo đặt xe thành công!');
+            window.location.href = '/bookings';
+        } else {
+            // Hiển thị lỗi chi tiết
+            const errorMsg = result.errors 
+                ? result.errors.join('\n') 
+                : result.message || 'Không thể tạo đặt xe';
+            alert('Lỗi:\n' + errorMsg);
+        }
+    } catch (error) {
+        console.error("❌ [FE] Lỗi:", error);
+        alert('Lỗi kết nối: ' + error.message);
+    }
+});
+</script>

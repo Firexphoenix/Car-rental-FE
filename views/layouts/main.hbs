@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-car"></i> Car Rental
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {{#if (eq page 'home')}}active{{/if}}" href="/">
+                            <i class="fas fa-home"></i> Trang Chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if (eq page 'cars')}}active{{/if}}" href="/cars">
+                            <i class="fas fa-car"></i> Xe
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if (eq page 'bookings')}}active{{/if}}" href="/bookings">
+                            <i class="fas fa-calendar-check"></i> Đặt Xe
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if (eq page 'contracts')}}active{{/if}}" href="/contracts">
+                            <i class="fas fa-file-contract"></i> Hợp Đồng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if (eq page 'users')}}active{{/if}}" href="/users">
+                            <i class="fas fa-users"></i> Người Dùng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{#if (eq page 'admin')}}active{{/if}}" href="/admin/dashboard">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid py-4">
+        {{{body}}}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-car"></i> Car Rental</h5>
+                    <p>Hệ thống quản lý cho thuê xe chuyên nghiệp</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Liên Hệ</h5>
+                    <p>
+                        <i class="fas fa-phone"></i> 0123-456-789<br>
+                        <i class="fas fa-envelope"></i> info@carrental.com
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Theo Dõi</h5>
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-2x"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <div class="text-center">
+                <p>&copy; 2024 Car Rental System - LeVuMinhHoang_DE180724</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-user-plus"></i> Thêm Người Dùng Mới</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/users">Người dùng</a></li>
+                <li class="breadcrumb-item active">Thêm mới</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user"></i> Thông Tin Người Dùng</h5>
+            </div>
+            <div class="card-body">
+                <form id="createUserForm">
+                    <div class="row">
+                        <!-- Username -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i> Tên đăng nhập <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" name="username" required minlength="3">
+                            <small class="text-muted">Tối thiểu 3 ký tự</small>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-envelope"></i> Email <span class="text-danger">*</span>
+                            </label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i> Mật khẩu <span class="text-danger">*</span>
+                            </label>
+                            <input type="password" class="form-control" name="password" required minlength="6">
+                            <small class="text-muted">Tối thiểu 6 ký tự</small>
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-id-card"></i> Họ và tên <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" name="fullName" required>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-phone"></i> Số điện thoại <span class="text-danger">*</span>
+                            </label>
+                            <input type="tel" class="form-control" name="phone" required pattern="[0-9]{10}">
+                            <small class="text-muted">10 chữ số</small>
+                        </div>
+
+                        <!-- Role -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-user-tag"></i> Vai trò <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" name="role" required>
+                                <option value="USER" selected>Người dùng</option>
+                                <option value="ADMIN">Quản trị viên</option>
+                            </select>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-info-circle"></i> Trạng thái
+                            </label>
+                            <select class="form-select" name="status">
+                                <option value="ACTIVE" selected>Hoạt động</option>
+                                <option value="INACTIVE">Không hoạt động</option>
+                                <option value="BANNED">Bị cấm</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="/users" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Hủy
+                        </a>
+                        <button type="reset" class="btn btn-warning">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu Người Dùng
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert('Đã thêm người dùng thành công!');
+            window.location.href = '/users';
+        } else {
+            alert('Lỗi: ' + (result.message || 'Không thể thêm người dùng'));
+        }
+    } catch (error) {
+        alert('Lỗi kết nối: ' + error.message);
+    }
+});
+</script>

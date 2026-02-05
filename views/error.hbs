@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-md-6 mx-auto text-center">
+        <div class="card shadow-lg">
+            <div class="card-body p-5">
+                <i class="fas fa-exclamation-triangle fa-5x text-warning mb-4"></i>
+                <h1 class="display-4 mb-3">{{title}}</h1>
+                <p class="lead text-muted mb-4">{{message}}</p>
+                
+                {{#if error}}
+                <div class="alert alert-danger text-start">
+                    <h6><i class="fas fa-bug"></i> Chi Tiết Lỗi:</h6>
+                    <pre class="mb-0"><code>{{error}}</code></pre>
+                </div>
+                {{/if}}
+                
+                <div class="d-flex gap-2 justify-content-center mt-4">
+                    <a href="/" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Về Trang Chủ
+                    </a>
+                    <button onclick="history.back()" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

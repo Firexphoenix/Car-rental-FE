@@ -1,0 +1,169 @@
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="fas fa-calendar-check"></i> Danh Sách Đặt Xe</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="/bookings/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tạo Đặt Xe Mới
+        </a>
+    </div>
+</div>
+
+
+<!-- Bookings List -->
+{{#if bookings}}
+<div class="row">
+    {{#each bookings}}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-{{statusBadge this.status}}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 text-white">
+                        <i class="fas fa-hashtag"></i> Booking #{{@index}}
+                    </h6>
+                    <span class="badge bg-white text-{{statusBadge this.status}}">
+                        {{this.status}}
+                    </span>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- User Info -->
+                <div class="mb-3">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-user"></i> Khách hàng
+                    </h6>
+                    {{#if this.user}}
+                    <p class="mb-0">
+                        <strong>
+                            {{#if this.user.fullName}}
+                                {{this.user.fullName}}
+                            {{else}}
+                                User ID: {{this.user}}
+                            {{/if}}
+                        </strong>
+                    </p>
+                    {{#if this.user.phone}}
+                    <p class="mb-0 text-muted">
+                        <i class="fas fa-phone"></i> {{this.user.phone}}
+                    </p>
+                    {{/if}}
+                    {{/if}}
+                </div>
+
+                <hr>
+
+                <!-- Car Info -->
+                <div class="mb-3">
+                    <h6 class="text-muted mb-2">
+                        <i class="fas fa-car"></i> Xe thuê
+                    </h6>
+                    {{#if this.car}}
+                    <p class="mb-0">
+                        <strong>
+                            {{#if this.car.brand}}
+                                {{this.car.brand}} {{this.car.model}}
+                            {{else}}
+                                Car ID: {{this.car}}
+                            {{/if}}
+                        </strong>
+                    </p>
+                    {{#if this.car.licensePlate}}
+                    <p class="mb-0 text-muted">
+                        <i class="fas fa-id-card"></i> {{this.car.licensePlate}}
+                    </p>
+                    {{/if}}
+                    {{/if}}
+                </div>
+
+                <hr>
+
+                <!-- Booking Details -->
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted">Ngày bắt đầu</small>
+                        <p class="mb-0"><strong>{{formatDate this.startDate}}</strong></p>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Ngày kết thúc</small>
+                        <p class="mb-0"><strong>{{formatDate this.endDate}}</strong></p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h5 class="text-primary mb-0">
+                        {{formatCurrency this.totalPrice}}
+                    </h5>
+                    <small class="text-muted">Tổng tiền</small>
+                </div>
+
+                {{#if this.notes}}
+                <div class="mb-3">
+                    <small class="text-muted">Ghi chú:</small>
+                    <p class="mb-0">{{this.notes}}</p>
+                </div>
+                {{/if}}
+            </div>
+            <div class="card-footer">
+                <div class="d-flex gap-2">
+                    <a href="/bookings/{{this._id}}" class="btn btn-sm btn-outline-primary flex-fill">
+                        <i class="fas fa-eye"></i> Chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
+{{else}}
+<div class="alert alert-info text-center">
+    <i class="fas fa-info-circle"></i> Chưa có đặt xe nào
+</div>
+{{/if}}
+
+<script>
+async function confirmBooking(id) {
+    if (confirm('Xác nhận đặt xe này?')) {
+        try {
+            const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: 'CONFIRMED' })
+            });
+            
+            if (response.ok) {
+                alert('Đã xác nhận đặt xe!');
+                location.reload();
+            } else {
+                alert('Lỗi khi xác nhận đặt xe');
+            }
+        } catch (error) {
+            alert('Lỗi: ' + error.message);
+        }
+    }
+}
+
+async function cancelBooking(id) {
+    if (confirm('Hủy đặt xe này?')) {
+        try {
+            const response = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: 'CANCELLED' })
+            });
+            
+            if (response.ok) {
+                alert('Đã hủy đặt xe!');
+                location.reload();
+            } else {
+                alert('Lỗi khi hủy đặt xe');
+            }
+        } catch (error) {
+            alert('Lỗi: ' + error.message);
+        }
+    }
+}
+</script>

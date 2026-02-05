@@ -1,0 +1,167 @@
+<div class="row mb-4">
+  <div class="col-md-6">
+    <h2><i class="fas fa-car"></i> Danh Sách Xe</h2>
+  </div>
+  <div class="col-md-6 text-end">
+    <a href="/cars/create" class="btn btn-primary">
+      <i class="fas fa-plus"></i>
+      Thêm Xe Mới
+    </a>
+  </div>
+</div>
+
+{{#if cars}}
+  <div class="row">
+    {{#each cars}}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="position-relative">
+
+            <img
+              src="{{firstImage this.images}}"
+              class="card-img-top"
+              alt="{{this.brand}} {{this.model}}"
+              style="height: 200px; object-fit: cover;"
+              onerror="this.onerror=null; this.src='/image/car.jpg';"
+            />
+            <span
+              class="position-absolute top-0 end-0 badge bg-{{statusBadge
+                  this.status
+                }}
+                m-2"
+            >
+              {{this.status}}
+            </span>
+          </div>
+
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="card-title mb-0">{{this.brand}} {{this.model}}</h5>
+              <span
+                class="badge bg-{{statusBadge this.status}}"
+              >{{this.status}}</span>
+            </div>
+
+            <p class="text-muted mb-2">
+              <i class="fas fa-id-card"></i>
+              {{this.licensePlate}}
+            </p>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <small class="text-muted"><i class="fas fa-calendar"></i>
+                  Năm:
+                  {{this.year}}</small>
+              </div>
+              <div class="col-6">
+                <small class="text-muted"><i class="fas fa-paint-brush"></i>
+                  {{this.color}}</small>
+              </div>
+              <div class="col-6">
+                <small class="text-muted"><i class="fas fa-users"></i>
+                  {{this.seats}}
+                  chỗ</small>
+              </div>
+              <div class="col-6">
+                <small class="text-muted"><i class="fas fa-cog"></i>
+                  {{this.transmission}}</small>
+              </div>
+              <div class="col-12">
+                <small class="text-muted"><i class="fas fa-gas-pump"></i>
+                  {{this.fuelType}}</small>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <h4 class="text-primary mb-0">
+                {{formatCurrency this.pricePerDay}}
+                <small class="text-muted fs-6">/ngày</small>
+              </h4>
+            </div>
+
+            {{#if this.description}}
+              <p class="card-text mt-2"><small
+                  class="text-muted"
+                >{{this.description}}</small></p>
+            {{/if}}
+
+            {{#if this.features}}
+              <div class="mt-2">
+                {{#each this.features}}
+                  <span class="badge bg-info me-1 mb-1">{{this}}</span>
+                {{/each}}
+              </div>
+            {{/if}}
+          </div>
+
+          <div class="card-footer bg-white">
+            <div class="d-flex gap-2">
+              <a
+                href="/cars/{{this._id}}"
+                class="btn btn-sm btn-outline-primary flex-fill"
+              >
+                <i class="fas fa-eye"></i>
+                Chi tiết
+              </a>
+              <button
+                class="btn btn-sm btn-outline-warning"
+                onclick="editCar('{{this._id}}')"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger"
+                onclick="deleteCar('{{this._id}}')"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+{{else}}
+  <div class="alert alert-info text-center">
+    <i class="fas fa-info-circle"></i>
+    Chưa có xe nào trong hệ thống
+  </div>
+{{/if}}
+
+<script>
+  // Hàm chuyển hướng sang trang sửa
+  function editCar(id) {
+    window.location.href = `/cars/${id}/edit`;
+  }
+
+  // Hàm xóa xe
+  async function deleteCar(id) {
+    // 1. Xác nhận trước khi xóa
+    if (!confirm('Bạn có chắc chắn muốn xóa xe này? Hành động này không thể hoàn tác.')) {
+      return;
+    }
+
+    try {
+      // 2. Gọi API xóa (Lưu ý: Port 3000)
+      const response = await fetch(`http://localhost:3000/api/cars/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // 3. Xử lý kết quả
+      if (response.ok) {
+        alert('✅ Đã xóa xe thành công!');
+        // Reload lại trang để cập nhật danh sách
+        window.location.reload(); 
+      } else {
+        const data = await response.json();
+        alert('❌ Lỗi: ' + (data.message || 'Không thể xóa xe'));
+      }
+    } catch (error) {
+      console.error('Lỗi xóa xe:', error);
+      alert('❌ Lỗi kết nối đến Server API (Kiểm tra xem Backend chạy chưa?)');
+    }
+  }
+</script>

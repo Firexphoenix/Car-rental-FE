@@ -1,0 +1,241 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-user"></i> Chi Tiết Người Dùng</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/users">Người dùng</a></li>
+                <li class="breadcrumb-item active">Chi tiết</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+{{#if user}}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="mb-3">
+                    <i class="fas fa-user-circle fa-5x text-primary"></i>
+                </div>
+                <h4>{{user.fullName}}</h4>
+                <p class="text-muted">@{{user.username}}</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <span class="badge bg-{{#if (eq user.role 'ADMIN')}}danger{{else}}primary{{/if}}">
+                        {{user.role}}
+                    </span>
+                    <span class="badge bg-{{statusBadge user.status}}">
+                        {{user.status}}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông Tin Chi Tiết</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td width="30%"><strong><i class="fas fa-user"></i> Tên đầy đủ:</strong></td>
+                            <td>{{user.fullName}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fas fa-at"></i> Tên đăng nhập:</strong></td>
+                            <td>{{user.username}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fas fa-envelope"></i> Email:</strong></td>
+                            <td>
+                                <a href="mailto:{{user.email}}">{{user.email}}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fas fa-phone"></i> Số điện thoại:</strong></td>
+                            <td>
+                                <a href="tel:{{user.phone}}">{{user.phone}}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fas fa-user-tag"></i> Vai trò:</strong></td>
+                            <td>
+                                <span class="badge bg-{{#if (eq user.role 'ADMIN')}}danger{{else}}primary{{/if}}">
+                                    {{user.role}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fas fa-info-circle"></i> Trạng thái:</strong></td>
+                            <td>
+                                <span class="badge bg-{{statusBadge user.status}}">
+                                    {{user.status}}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fas fa-calendar-plus"></i> Ngày tạo:</strong></td>
+                            <td>{{formatDateTime user.createdAt}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong><i class="fas fa-calendar-check"></i> Cập nhật:</strong></td>
+                            <td>{{formatDateTime user.updatedAt}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-warning" onclick="editUser()">
+                        <i class="fas fa-edit"></i> Chỉnh Sửa
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteUser()">
+                        <i class="fas fa-trash"></i> Xóa
+                    </button>
+                    <a href="/users" class="btn btn-secondary ms-auto">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User's Cars (if owner) -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-car"></i> Xe Của Người Dùng</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Danh sách xe thuộc sở hữu của người dùng này...</p>
+                <button class="btn btn-primary btn-sm" onclick="loadUserCars()">
+                    <i class="fas fa-sync"></i> Tải Danh Sách Xe
+                </button>
+                <div id="userCarsContainer" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User's Bookings -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Lịch Sử Đặt Xe</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Các đặt xe của người dùng này...</p>
+                <button class="btn btn-success btn-sm" onclick="loadUserBookings()">
+                    <i class="fas fa-sync"></i> Tải Lịch Sử
+                </button>
+                <div id="userBookingsContainer" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editUser() {
+    window.location.href = '/users/{{user._id}}/edit';
+}
+
+function deleteUser() {
+    if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
+        fetch('http://localhost:3000/api/users/{{user._id}}', {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Đã xóa người dùng thành công!');
+            window.location.href = '/users';
+        })
+        .catch(error => {
+            alert('Lỗi khi xóa người dùng: ' + error.message);
+        });
+    }
+}
+
+async function loadUserCars() {
+    const container = document.getElementById('userCarsContainer');
+    container.innerHTML = '<div class="spinner-border text-primary"></div>';
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/cars?owner={{user._id}}');
+        const cars = await response.json();
+        
+        if (cars.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">Người dùng chưa có xe nào</div>';
+            return;
+        }
+        
+        let html = '<div class="row">';
+        cars.forEach(car => {
+            html += `
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>${car.brand} ${car.model}</h6>
+                            <p class="mb-1"><small>${car.licensePlate}</small></p>
+                            <a href="/cars/${car._id}" class="btn btn-sm btn-outline-primary">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        container.innerHTML = html;
+    } catch (error) {
+        container.innerHTML = '<div class="alert alert-danger">Lỗi khi tải dữ liệu</div>';
+    }
+}
+
+async function loadUserBookings() {
+    const container = document.getElementById('userBookingsContainer');
+    container.innerHTML = '<div class="spinner-border text-success"></div>';
+    
+    try {
+        const response = await fetch('http://localhost:3000/api/bookings?user={{user._id}}');
+        const bookings = await response.json();
+        
+        if (bookings.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">Người dùng chưa có đặt xe nào</div>';
+            return;
+        }
+        
+        let html = '<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Xe</th><th>Ngày bắt đầu</th><th>Ngày kết thúc</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>';
+        
+        bookings.forEach(booking => {
+            const carInfo = booking.car ? `${booking.car.brand} ${booking.car.model}` : 'N/A';
+            html += `
+                <tr>
+                    <td>${carInfo}</td>
+                    <td>${new Date(booking.startDate).toLocaleDateString('vi-VN')}</td>
+                    <td>${new Date(booking.endDate).toLocaleDateString('vi-VN')}</td>
+                    <td><span class="badge bg-primary">${booking.status}</span></td>
+                    <td><a href="/bookings/${booking._id}" class="btn btn-sm btn-outline-primary">Chi tiết</a></td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+    } catch (error) {
+        container.innerHTML = '<div class="alert alert-danger">Lỗi khi tải dữ liệu</div>';
+    }
+}
+</script>
+
+{{else}}
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i> Không tìm thấy thông tin người dùng
+</div>
+{{/if}}

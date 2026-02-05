@@ -1,0 +1,151 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-plus-circle"></i> Thêm Xe Mới</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/cars">Xe</a></li>
+                <li class="breadcrumb-item active">Thêm mới</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form id="createCarForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Chủ xe <span class="text-danger">*</span></label>
+                    <select class="form-select" name="owner" required>
+                        <option value="">-- Chọn chủ xe --</option>
+                        {{#each users}}
+                        <option value="{{this._id}}">{{this.fullName}} ({{this.email}})</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Biển số xe <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="licensePlate" placeholder="51A-123.45" required />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Hãng xe <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="brand" placeholder="Toyota" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Model <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="model" placeholder="Camry" required />
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Năm SX</label>
+                    <input type="number" class="form-control" name="year" value="2024" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Màu sắc</label>
+                    <input type="text" class="form-control" name="color" placeholder="Trắng" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Số chỗ</label>
+                    <input type="number" class="form-control" name="seats" value="5" required />
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Giá thuê/ngày</label>
+                    <input type="number" class="form-control" name="pricePerDay" placeholder="500000" required />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Hộp số</label>
+                    <select class="form-select" name="transmission">
+                        <option value="AUTOMATIC">Tự động</option>
+                        <option value="MANUAL">Số sàn</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nhiên liệu</label>
+                    <select class="form-select" name="fuelType">
+                        <option value="PETROL">Xăng</option>
+                        <option value="DIESEL">Dầu</option>
+                        <option value="ELECTRIC">Điện</option>
+                    </select>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label">Mô tả</label>
+                    <textarea class="form-control" name="description" rows="2"></textarea>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label">Tính năng (Mỗi dòng 1 tính năng)</label>
+                    <textarea class="form-control" id="featuresInput" rows="3" placeholder="Camera 360&#10;Cửa sổ trời"></textarea>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <label class="form-label">Link Hình ảnh (Mỗi dòng 1 link)</label>
+                    <textarea class="form-control" id="imagesInput" rows="3" placeholder="https://example.com/xe.jpg"></textarea>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <a href="/cars" class="btn btn-secondary me-2">Hủy</a>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu Xe</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('createCarForm');
+        
+        if (!form) {
+            console.error('Không tìm thấy form createCarForm!');
+            return;
+        }
+
+        form.addEventListener('submit', async function(e) {
+            // 1. CHẶN RELOAD TRANG (Quan trọng nhất)
+            e.preventDefault();
+            console.log('Bắt đầu submit form...');
+
+            // 2. Lấy dữ liệu
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            // 3. Xử lý mảng (Tính năng & Ảnh)
+            const featuresRaw = document.getElementById('featuresInput').value;
+            data.features = featuresRaw.split('\n').map(x => x.trim()).filter(x => x);
+
+            const imagesRaw = document.getElementById('imagesInput').value;
+            data.images = imagesRaw.split('\n').map(x => x.trim()).filter(x => x);
+
+            data.status = 'AVAILABLE';
+
+            try {
+                // 4. Gửi API
+                const response = await fetch('http://localhost:3000/api/cars', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('✅ Thêm xe thành công!');
+                    window.location.href = '/cars';
+                } else {
+                    console.error('API Error:', result);
+                    alert('❌ Lỗi: ' + (result.message || 'Không xác định'));
+                }
+            } catch (error) {
+                console.error('Network Error:', error);
+                alert('❌ Không kết nối được server API (Kiểm tra xem backend chạy chưa)');
+            }
+        });
+    });
+</script>
